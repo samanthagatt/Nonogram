@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  PuzzleView.swift
 //  Nonogram
 //
 //  Created by Samantha Gatt on 6/5/20.
@@ -11,17 +11,28 @@ import SwiftUI
 struct PuzzleView: View {
     @State private var rows: Int = 15
     @State private var columns: Int = 15
+    @State private var cache: Set<String> = []
     
     private let outerBorderWidth: CGFloat = 2
     private let outerPadding: CGFloat = 16
     
     var body: some View {
-        GeometryReader { geometry in
+        return GeometryReader { geometry in
             VStack {
                 Spacer()
                 
-                GridStack(rows: self.rows, columns: self.columns) { row, column in
-                    Color.gray.border(Color.black)
+                GridStack(rows: self.rows, columns: self.columns) { row, col in
+                    self.getColor(for: row, and: col)
+                        .border(Color.black, width: 0.5)
+                        .onTapGesture {
+                            let str = "\(row),\(col)"
+                            print(str)
+                            if self.cache.contains(str) {
+                                self.cache.remove(str)
+                            } else {
+                                self.cache.insert(str)
+                            }
+                        }
                 }
                 .padding(self.outerBorderWidth)
                 .border(Color.black, width: self.outerBorderWidth)
@@ -31,6 +42,12 @@ struct PuzzleView: View {
                 Spacer()
             }
         }
+    }
+    
+    private func getColor(for row: Int, and col: Int) -> some View {
+        let str = "\(row),\(col)"
+        let color: Color = self.cache.contains(str) ? .black : .clear
+        return color
     }
 }
 
